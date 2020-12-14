@@ -12,9 +12,9 @@ py-livehunt collects livehunt notification from VirusTotal, and send it to slack
 # Usage
 ```
 Usage: python3 py-livehunt.py
+```
 
 # Install
-
 ```
 git clone
 cd py-livehunt
