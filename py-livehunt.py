@@ -12,6 +12,7 @@ load_dotenv(dotenv_path)
 SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN")
 SLACK_CHANNEL = os.environ.get("SLACK_CHANNEL")
 VTAPI = os.environ.get("VTAPI")
+RULENAME = os.environ.get("RULE_NAME")
 client = WebClient(token=SLACK_BOT_TOKEN)
 
 headers = {
@@ -30,8 +31,13 @@ def fetch_notification():
 
     start_dt = day_after_before.strftime("%Y-%m-%d") + "T15:00:00+"
     end_dt = yesterday.strftime("%Y-%m-%d") + "T15:00:00-"
-    filter = "date:" + start_dt + " and date:" + end_dt
-    # demo_filter = "date:2020-11-20T17:33:00+ and date:2020-11-20T17:35:00-"
+
+    if not RULENAME:
+        filter = "date:" + start_dt + " and date:" + end_dt
+        # demo_filter = "date:2021-01-11T17:33:00+ and date:2021-01-18T17:35:00-"
+    else:
+        filter = "date:" + start_dt + " and date:" + end_dt + " and tag:" + RULENAME
+        # demo_filter = "date:2021-01-11T17:33:00+ and date:2021-01-18T17:35:00- and tag:" + RULENAME
 
     # prepare report timesamp
     report_from = day_after_before.strftime("%Y-%m-%d") + " 15:00:00 UTC"
@@ -41,7 +47,7 @@ def fetch_notification():
     vturl = "https://www.virustotal.com/api/v3/intelligence/hunting_notification_files"
 
     params = {
-        "limit": limit,
+        "limit": limit, 
         "filter": filter
         # "filter": demo_filter
     }
@@ -66,12 +72,19 @@ If you need to show more results, please modify parameter or vist VT site.
             date = dt.datetime.utcfromtimestamp(utc_date).strftime('%Y/%m/%d %H:%M:%S')
             file_id = data["id"]
             file_link = "https://www.virustotal.com/gui/file/" + file_id + "/detection"
+
+            # check if meaningful_name exists
+            attributes = data["attributes"]
+            file_name = attributes.get("meaningful_name", "No meaningful names")
+
+            # file_name = data["attributes"]["meaningful_name"]
             rule_name = data["context_attributes"]["rule_name"]
 
             item = f"""\
 ====================
 alert id: {count} 
 notifed at: {date}
+file name: {file_name}
 file link: {file_link}
 rule name: {rule_name}
 """
@@ -80,7 +93,7 @@ rule name: {rule_name}
     
     report += "====================\n"
     report += "Have a good day!"
-    # print(report)
+    print(report)
     return report
 
 try:
