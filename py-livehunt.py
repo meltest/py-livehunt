@@ -69,7 +69,7 @@ If you need to show more results, please modify parameter or vist VT site.
     else: 
         for data in result["data"]:
             utc_date = data["context_attributes"]["notification_date"]
-            date = dt.datetime.utcfromtimestamp(utc_date).strftime('%Y/%m/%d %H:%M:%S')
+            date = dt.datetime.utcfromtimestamp(utc_date).strftime('%Y/%m/%d %H:%M:%S') + " (UTC)"
             file_id = data["id"]
             file_link = "https://www.virustotal.com/gui/file/" + file_id + "/detection"
 
