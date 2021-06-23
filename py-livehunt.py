@@ -1,5 +1,6 @@
 import os
 import json
+import re
 import requests
 import datetime as dt
 from dotenv import load_dotenv
@@ -58,7 +59,7 @@ def fetch_notification():
 
     # metadata for report
     report += f"""\
-VT notifier got following alerts from livehunt during {report_from} - {report_to}.
+VT Notifier got following alerts from livehunt during {report_from} - {report_to}.
 This notification shows only {limit} results.
 If you need to show more results, please modify parameter or vist VT site.
 """
@@ -77,16 +78,23 @@ If you need to show more results, please modify parameter or vist VT site.
             attributes = data["attributes"]
             file_name = attributes.get("meaningful_name", "No meaningful names")
 
-            # file_name = data["attributes"]["meaningful_name"]
+            notification_snippet_raw = data["context_attributes"]["notification_snippet"]
+            # reformatting message in order to improve readability on slack
+            notification_snippet_liner = re.sub("^.*  ", "", notification_snippet_raw, flags=re.MULTILINE).replace("\n","")
+            notification_snippet_trim = re.sub("\*end_highlight\*\*begin_highlight\*", "", notification_snippet_liner)
+            notification_snippet = re.sub("\*(begin|end)_highlight\*", "\u200b`", notification_snippet_trim)
+
             rule_name = data["context_attributes"]["rule_name"]
 
             item = f"""\
 ====================
-alert id: {count} 
-notifed at: {date}
-file name: {file_name}
-file link: {file_link}
-rule name: {rule_name}
+Alert ID: {count} 
+Notified At: {date}
+File Name: {file_name}
+File Link: {file_link}
+Snippet:
+{notification_snippet}
+Rule Name: {rule_name}
 """
             report += item
             count += 1
@@ -98,8 +106,9 @@ rule name: {rule_name}
 
 try:
     report = fetch_notification()
+    response = client.chat_postMessage(channel=SLACK_CHANNEL, text=report, parse="none")
     # response = client.chat_postMessage(channel=SLACK_CHANNEL, text=report)
-    response = client.files_upload(channels=SLACK_CHANNEL, content=report, title="VT_Notifier")
+    # response = client.files_upload(channels=SLACK_CHANNEL, content=report, title="VT_Notifier")
 except SlackApiError as e:
     # You will get a SlackApiError if "ok" is False
     assert e.response["ok"] is False
