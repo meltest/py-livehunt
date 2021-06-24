@@ -30,8 +30,13 @@ def fetch_notification():
     yesterday = today - dt.timedelta(days=1)
     day_after_before = today - dt.timedelta(days=2)
 
-    start_dt = day_after_before.strftime("%Y-%m-%d") + "T15:00:00+"
-    end_dt = yesterday.strftime("%Y-%m-%d") + "T15:00:00-"
+    # UTC
+    # start_dt = day_after_before.strftime("%Y-%m-%d") + "T15:00:00+"
+    # end_dt = yesterday.strftime("%Y-%m-%d") + "T15:00:00-"
+
+    # JST
+    start_dt = yesterday.strftime("%Y-%m-%d") + "T00:00:00+"
+    end_dt = today.strftime("%Y-%m-%d") + "T00:00:00-"
 
     if not RULENAME:
         filter = "date:" + start_dt + " and date:" + end_dt
@@ -40,9 +45,14 @@ def fetch_notification():
         filter = "date:" + start_dt + " and date:" + end_dt + " and tag:" + RULENAME
         # demo_filter = "date:2021-01-11T17:33:00+ and date:2021-01-18T17:35:00- and tag:" + RULENAME
 
-    # prepare report timesamp
-    report_from = day_after_before.strftime("%Y-%m-%d") + " 15:00:00 UTC"
-    report_to = yesterday.strftime("%Y-%m-%d") + " 15:00:00 UTC"
+    # prepare report timestamp
+    # UTC
+    # report_from = day_after_before.strftime("%Y-%m-%d") + " 15:00:00 UTC"
+    # report_to = yesterday.strftime("%Y-%m-%d") + " 15:00:00 UTC"
+
+    # JST
+    report_from = yesterday.strftime("%Y-%m-%d") + " 09:00:00 JST"
+    report_to = today.strftime("%Y-%m-%d") + " 09:00:00 JST"
 
     # prepare request for VT
     vturl = "https://www.virustotal.com/api/v3/intelligence/hunting_notification_files"
