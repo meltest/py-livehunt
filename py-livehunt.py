@@ -39,11 +39,11 @@ def fetch_notification():
     end_dt = today.strftime("%Y-%m-%d") + "T00:00:00-"
 
     if not RULENAME:
-        filter = "date:" + start_dt + " and date:" + end_dt
-        # demo_filter = "date:2021-01-11T17:33:00+ and date:2021-01-18T17:35:00-"
+        filter = "date:" + start_dt + " date:" + end_dt
+        # demo_filter = "date:2021-09-11T17:33:00+ date:2021-09-16T17:35:00-"
     else:
-        filter = "date:" + start_dt + " and date:" + end_dt + " and tag:" + RULENAME
-        # demo_filter = "date:2021-01-11T17:33:00+ and date:2021-01-18T17:35:00- and tag:" + RULENAME
+        filter = "date:" + start_dt + " date:" + end_dt + " tag:" + RULENAME
+        # demo_filter = "date:2021-09-11T17:33:00+ date:2021-09-16T17:35:00- tag:" + RULENAME
 
     # prepare report timestamp
     # UTC
