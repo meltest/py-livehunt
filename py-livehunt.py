@@ -85,8 +85,13 @@ If you need to show more results, please modify parameter or vist VT site.
             file_link = "https://www.virustotal.com/gui/file/" + file_id + "/detection"
 
             # check if meaningful_name exists
-            attributes = data["attributes"]
-            file_name = attributes.get("meaningful_name", "No meaningful names")
+            if data.get("attributes"):
+                attributes = data["attributes"]
+                file_name = attributes.get("meaningful_name", "No meaningful names")
+                file_name = attributes.get("meaningful_name", "No meaningful names")
+            # if data["attributes"] doesn't exist at notification timing, the file may be deleted
+            else:
+                file_name = "File Not Found (maybe deleted)"
 
             notification_snippet_raw = data["context_attributes"]["notification_snippet"]
             # reformatting message in order to improve readability on slack
@@ -110,6 +115,9 @@ Rule Name: {rule_name}
             count += 1
     
     report += "====================\n"
+    report += "*############ REMIND ############*\n"
+    report += "*# Check the credential list for duplicates #*\n"
+    report += "*################################*\n"
     report += "Have a good day!"
     print(report)
     return report
