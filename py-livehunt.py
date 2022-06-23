@@ -71,7 +71,7 @@ def fetch_notification():
     report += f"""\
 VT Notifier got following alerts from livehunt during {report_from} - {report_to}.
 This notification shows only {limit} results.
-If you need to show more results, please modify parameter or vist VT site.
+If you need to show more results, please modify parameter or visit VT site.
 """
 
     if not result["data"]:

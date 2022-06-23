@@ -12,7 +12,8 @@ load_dotenv(dotenv_path)
 VTAPI = os.environ.get("VTAPI")
 
 headers = {
-   "x-apikey": VTAPI
+   "x-apikey": VTAPI,
+   "Content-Type": "application/json"
 }
 
 # get arguments
@@ -37,7 +38,7 @@ def post_ruleset(rule_name, targets):
     condition = ""
     count = 1
     for target in targets:
-       strings += f'  $target{count} = "{target}" nocase\n' 
+       strings += f'  $target{count} = /(@[\w_\.-]+\.|@){target}/ nocase\n'
        count += 1
 
     condition += f'  (any of them)\n'
@@ -45,6 +46,7 @@ def post_ruleset(rule_name, targets):
     condition += f'  and not vt.metadata.file_type == vt.FileType.PE_DLL\n'
     condition += f'  and not vt.metadata.file_type == vt.FileType.ELF\n'
     condition += f'  and not vt.metadata.file_type == vt.FileType.ANDROID'
+    condition += f'  and vt.metadata.new_file'
 
     rules = f'import "vt"\n\nrule {rule_name}\n{{\n strings:\n{strings} condition:\n{condition}\n}}'
 
